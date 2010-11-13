@@ -18,14 +18,36 @@ function instantify(id, fn) {
         $(debug).html("Search query: " + this.value);
         $.getJSON('/token/' + this.value, function(ret) {
             $("div#results").html("");
-            $.each(ret, function(i, item) {
-              $("<li/>").html(item.file + ": " + item.token).appendTo("div#results");
+
+            ul = $("<ul/>").attr({
+                'id':'reslist',
+                'data-role': 'listview',
+                'class':"ui-listview",
             });
+
+            ul.append($("<li/>").attr({
+                'data-role':'list-divider',
+                'class':'ui-li ui-li-divider ui-btn ui-bar-b ui-btn-up-undefined'
+            }).html("Results"));
+
+            $.each(ret, function(i, item) {
+                t = $("<h3/>").attr({
+                    'class':'ui-li-heading',
+                }).html(item.token);
+                f = $("<p/>").attr({'class':'ui-li-desc mono'})
+                    .html(item.filename);
+                $("<li/>").attr({
+                    'class':'ui-li ui-li-static ui-btn-up-c mono',
+                    'role':'option',
+                }).append(t).append(f).appendTo(ul);
+            });
+            $("div#results").append(ul);
+            $("ul").listview(refresh);
         });
     });
 }
 
 function init() {
-    blur_input_box("input#q", 'search');
+    //blur_input_box("input#q", 'search');
     instantify("input#q", '');
 }

@@ -41,12 +41,12 @@ def read_ctags(fname):
             if l.startswith('!'):
                 continue
             l = l.strip()
-        # tok, file, vimcmd, opts
+            # tok, file, vimcmd, opts
             tok, file, rest = l.split('\t',2)
             pat, opt = rest.strip().split('"\t', 1)
             opts = opt.strip().split('\t')
             row = { 'token': tok,
-                    'file': file }
+                    'filename': file }
             row.update(dict(map(lambda i: tuple(i.split(':',1)), opts)))
             lst.append(row)
         except:
@@ -55,8 +55,10 @@ def read_ctags(fname):
 
 def populate_db(fname):
     start()
+    log('Reading tags')
     tags = read_ctags(fname)
     t.insert(tags)
+    log('Populated db')
 
 def drop_db():
     start()
@@ -68,29 +70,35 @@ def index():
     log("Creating indices..")
     t.create_index([
             ("token", pymongo.ASCENDING),
-            ("file", pymongo.ASCENDING),
+            ("filename", pymongo.ASCENDING),
             ])
     log("Done creating indices..")
 
-def prefix_search(limit=20,**kwargs):
+def db_search(limit=20,**kwargs):
     start()
     dic = {}
     for k,v in kwargs.iteritems():
-        dic[k] = {'$regex': '^%s' % v}
+        dic[k] = {'$regex': '%s' % v}
     results = t.find(dic, limit=limit)
     ret = []
     for item in results:
-        ret.append({'token':item['token'], 'file':item['file']})
+        ret.append({'token':item['token'], 'filename':item['filename']})
     return ret
 
 #populate_db('tags')
 #index()
 #sample()
-#prefix_search(limit=10, token='tcp_xmit')
 
-@app.route('/token/<prefix>')
-def search(prefix):
-    return json.dumps(prefix_search(limit=20, token=prefix))
+@app.route('/token/<s>')
+def search(s):
+    if len(s) <= 1:
+        return json.dumps([])
+    # simple prefix search
+    ret = db_search(limit=10, token='^%s' % s)
+    # full text search
+    if len(ret) < 10:
+        ret = db_search(limit=10, token=s)
+    return json.dumps(ret)
 
 if __name__ == "__main__":
     app.run()

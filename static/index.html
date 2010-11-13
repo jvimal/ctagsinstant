@@ -1,39 +1,35 @@
+<!DOCTYPE html>
 <html>
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"
-        type="text/javascript"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"
-        type="text/javascript"></script>
-<script src="/static/instant.js"
-        type="text/javascript"></script>
+  <title>ctags instant</title>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.min.css" />
+<script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.min.js"></script>
 
-<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css"
-      rel="stylesheet" type="text/css"/>
-<style>
-	#q {
-		width: 800px;
-		height: 20pt;
-		font: 15pt sans-serif black;
-	}
-	
-	#debug {
-		padding: 10px;
-		border: 1px solid red;
-		font-style: monospace;
-	}
-</style>
+<script src="/static/instant.js" type="text/javascript"></script>
+
 <script>
 $(document).ready(function() {
 	init();
 })
 </script>
+<style>
+.mono { font-family: monospace; }
+#q { width: 100%; font-family: arial sans-serif };
+</style>
 </head>
 
 <body>
-  <input id='q' type='text' value='search' />
-	<div id='debug'></div>
-	<div id='results'>
-	</div>
-</body>
+<div data-role="page" data-theme="b">
+  <div data-role="header">
+    <h1>Search ctags database</h1>
+  </div>
+  <div data-role="fieldcontain" align="center">
+    <input type="search" id="q" value="" align='left'/>
+  </div>
 
+  <div data-role="content" id="results">
+  </div>
+</div>
+</body>
 </html>
