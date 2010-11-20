@@ -15,7 +15,20 @@ $(document).ready(function() {
 </script>
 <style>
 .mono { font-family: monospace; }
-#q { width: 100%; font-family: arial sans-serif };
+#q { width: 100%; font-family: arial sans-serif }
+.lbl { 
+margin-right: 10px;
+padding-left: 5px;
+padding-right: 5px;
+font-size: 10px;
+margin-top: 10px;
+-webkit-border-radius: 5px;
+}
+.red {
+border: 1px solid white;
+color: white;
+background: #AA0000;
+}
 </style>
 </head>
 
@@ -25,11 +38,10 @@ $(document).ready(function() {
     <h1>Search ctags database</h1>
   </div>
   <div data-role="fieldcontain" align="center">
-    <input type="search" id="q" value="" align='left'/>
+    <input type="search" id="q" value=""/>
   </div>
 
-  <div data-role="content" id="results">
-  </div>
+  <div data-role="content" id="results"></div>
 </div>
 </body>
 </html>

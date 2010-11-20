@@ -6,7 +6,7 @@ from pymongo import Connection
 import re
 import sys
 import json
-from flask import Flask,url_for
+from flask import Flask,url_for,redirect
 
 app = Flask(__name__)
 connection = None
@@ -81,24 +81,66 @@ def db_search(limit=20,**kwargs):
         dic[k] = {'$regex': '%s' % v}
     results = t.find(dic, limit=limit)
     ret = []
+    count = results.count()
     for item in results:
-        ret.append({'token':item['token'], 'filename':item['filename']})
-    return ret
+        ret.append({
+                'token':item['token'],
+                'filename':item['filename'],
+                'line':item['line'],
+                'kind':item['kind'],
+                })
+    return {'count': count, 'results': ret}
 
 #populate_db('tags')
 #index()
 #sample()
 
+def preprocess(s):
+    ret = {}
+    allowed_keys = ["token","file","kind","lang"]
+
+    if ":" in s:
+        items = re.split('\s+', s)
+        for i in items:
+            if ":" in i:
+                k,v = map(lambda x: x.strip(), i.split(":"))
+                if k in ['function', 'macro', 'member','struct']:
+                    ret['kind'] = k
+                    ret['token'] = '^%s' % v
+                elif k in ['file']:
+                    ret['filename'] = v
+                else:
+                    ret[k] = v
+            elif not ret.has_key('token'):
+                ret['token'] = i
+    else:
+        ret['token'] = '^%s' % s
+    return ret
+
+#print preprocess('file:lo')
+#sys.exit(0)
+
 @app.route('/token/<s>')
 def search(s):
     if len(s) <= 1:
         return json.dumps([])
+    args = preprocess(s)
     # simple prefix search
-    ret = db_search(limit=10, token='^%s' % s)
+    ret = db_search(limit=20, **args)
     # full text search
     if len(ret) < 10:
-        ret = db_search(limit=10, token=s)
+        try:
+            args['token'] = args['token'][1:] # remove the ^
+        except:
+            args['token'] = ''
+            del args['token']
+        ret = db_search(limit=20, **args)
     return json.dumps(ret)
 
+@app.route('/')
+def main():
+    return redirect('/static/index.html')
+
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0', debug=True)
+
