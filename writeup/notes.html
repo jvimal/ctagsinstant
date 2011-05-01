@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+lang="en" xml:lang="en">
+<head>
+<title>Source Code Search</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2011-04-30 19:35:28 PDT"/>
+<meta name="author" content="Vimalkumar"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #add8e6; font-weight:normal }
+  .target { }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  {margin-left:auto; margin-right:0px;  text-align:right;}
+  .left   {margin-left:0px;  margin-right:auto; text-align:left;}
+  .center {margin-left:auto; margin-right:auto; text-align:center;}
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top;  }
+  th.right  { text-align:center;  }
+  th.left   { text-align:center;   }
+  th.center { text-align:center; }
+  td.right  { text-align:right;  }
+  td.left   { text-align:left;   }
+  td.center { text-align:center; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style>
+<style> * { font-family: sans-serif; } body { width: 700px; } </style>
+<style> pre, pre span { font-family: monospace; } </style>
+<style> code { font-family: monospace; font-size: 10pt; background-color: #EDEDED; padding: 2px;} </style>
+<style> td,th { border: 1px solid #ccc } </style>
+<style> div.figure { align: center; } </style>
+<style> h2 { border-bottom: 1px solid #ccc; color: #900; }
+h3, h4, h5, h6 {border-bottom: 1px solid #ccc; background-color: #F5F5F5; }</style>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+<div id="content">
+
+<h1 class="title">Source Code Search</h1>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23034236-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script') [ 0 ]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Introduction </a></li>
+<li><a href="#sec-2">2 Workflow </a></li>
+<li><a href="#sec-3">3 Architecture </a></li>
+<li><a href="#sec-4">4 mongodb </a></li>
+<li><a href="#sec-5">5 Examples </a></li>
+<li><a href="#sec-6">6 Features planned </a></li>
+<li><a href="#sec-7">7 Conclusion </a></li>
+<li><a href="#sec-8">8 Tools used </a></li>
+<li><a href="#sec-9">9 About me </a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction </h2>
+<div class="outline-text-2" id="text-1">
+
+
+<p>
+  I have been working on this project titled "CodeSearch" for a while.
+  Its aim is to provide a user friendly web interface to quickly
+  search through code in massive software code bases.  In this post, I
+  describe the architecture of the application (still in its infancy),
+  and where mongodb fits in.
+</p>
+<p>
+  As a programmer, I spend a lot of time searching through code to
+  lookup something specific.  Use cases include: (a) looking up
+  function names to look up their signature and documentation, (b)
+  looking up structures to check their members, or (c) just to learn
+  how a function is implemented.  In all cases, it becomes crucial to
+  quickly locate places where a particular symbol is defined and where
+  symbols are referenced.  Once located, the code can be browsed in an
+  editor.
+</p>
+<p>
+  This project aims to have a uniform, intuitive and rich query
+  interface for source code and expose it via a web interface, to make
+  it easily accessible for all.  It is a standalone app that just
+  needs to know the root source directory of a project.
+</p>
+<p>
+  In short, it's a Google CodeSearch for your own private codebase.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Workflow </h2>
+<div class="outline-text-2" id="text-2">
+
+<p>  A typical workflow with the CodeSearch application works as
+  follows.
+</p>
+<ol>
+<li>User registers an existing project with CodeSearch.  The project
+     information contains the root directory (or set of directories)
+     under which all the project source code exists.
+
+</li>
+<li>CodeSearch invokes ctags or any other indexing program to
+     generate the list of symbols in the project directory.  It then
+     parses the output and populates a project specific mongodb
+     database with symbols and their attributes.
+
+
+<div class="figure">
+<p><img src="tags-file.png"  alt="tags-file.png" /></p>
+<p>Example of a TAGS file generated by parsing the source directory of Flask, a popular Python webapp development module.</p>
+</div>
+
+</li>
+<li>User starts CodeSearch webapp and points the browser to open the
+     webpage and start searching.  By default, it is
+     <a href="http://localhost:5000/">http://localhost:5000/</a>.
+</li>
+</ol>
+
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Architecture </h2>
+<div class="outline-text-2" id="text-3">
+
+
+<p>
+  The application consists of three components:
+</p>
+<ol>
+<li><b>The parsing component.</b>
+
+<p>
+     All the heavy lifting is done by ctags at the moment.  Later on,
+     I plan to add support for specific parsers that are better than
+     ctags.  (ctags indexes the entire Linux source tree in about half
+     a minute, with a tags file of size ~200MB.)
+</p>
+
+<div class="figure">
+<p><img src="architecture.png"  alt="architecture.png" /></p>
+<p>Application architecture</p>
+</div>
+
+</li>
+<li><b>The indexing component.</b>
+
+<p>
+     The indexing component creates a project specific database,
+     parses the output of ctags and inserts all the symbols into the
+     database.  Each symbol is represented as a JSON record in the
+     database.  The record looks as follows:
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<tbody>
+<tr><td class="left"><b>Field name</b></td><td class="left"><b>Purpose</b></td><td class="left"><b>Example</b></td></tr>
+<tr><td class="left">token</td><td class="left">The actual token name</td><td class="left"><code>tcp_send_ack</code></td></tr>
+<tr><td class="left">filename</td><td class="left">Relative path of the file where the token is located</td><td class="left"><code>net/ipv4/tcp_output.c</code></td></tr>
+<tr><td class="left">kind</td><td class="left">What kind of a token is it?</td><td class="left"><code>function</code></td></tr>
+<tr><td class="left">line</td><td class="left">The line number where the token appears.</td><td class="left"><code>2716</code></td></tr>
+<tr><td class="left">signature</td><td class="left">Type signature of the token</td><td class="left"><code>(struct sock *sk)</code></td></tr>
+</tbody>
+</table>
+
+
+<p>
+     Indexes are generated for the token, filename and kind fields to
+     speed up search.
+</p>
+</li>
+<li><b>Search interface.</b>
+
+<p>
+     The search interface is a webapp that parses queries from the
+     user and presents the results in an "instant search" like fashion
+     where results are updated in realtime.  The query parser converts
+     the query to a mongodb query and passes the results back to the
+     user.
+</p>
+
+<div class="figure">
+<p><img src="simple.png"  alt="simple.png" /></p>
+<p>Example of a simple query on a database that stores tags from the Linux networking code.</p>
+</div>
+</li>
+</ol>
+
+</div>
+
+</div>
+
+<div id="outline-container-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> mongodb </h2>
+<div class="outline-text-2" id="text-4">
+
+
+<p>
+  mongodb seemed to be a good fit, for the following reasons:
+</p>
+<ol>
+<li><b>Simple JSON style data model.</b> The simple data model, combined
+     with in-place updates makes schema changes very easy.  For
+     example, if I want to add notes for a particular token, it is
+     very easy to do by just adjusting the schema outlined in the
+     table above.
+
+</li>
+<li><b>Fast indexes.</b> The Linux source tree has over 1.6Million tokens.
+     Being able to quickly search through them on any of the indexed
+     fields is a big plus.  Fast indexes also help present results in
+     realtime.
+
+</li>
+<li><b>Simple and powerful query interface.</b> Converting a query into a
+     query command is also very straightforward.  Support for regex
+     queries makes it easier to search for peculiar tokens.
+</li>
+</ol>
+
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Examples </h2>
+<div class="outline-text-2" id="text-5">
+
+<p>  Here are some screenshots of CodeSearch in action.  Please note that
+  this software is still under development.
+</p>
+<p>
+  Here is another query that narrows down the search by filtering on
+  filenames using regexes.  <img src="narrow.png"  alt="narrow.png" />
+</p>
+<p>
+  Another query example, that uses regexes for the actual token
+  string.  <img src="token.png"  alt="token.png" />
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Features planned </h2>
+<div class="outline-text-2" id="text-6">
+
+
+<p>
+  mongodb with its flexible document model has enabled me to easily
+  iterate and constantly change/improve the application design.  In
+  the future, I plan to add the following features.  The attached
+  screenshots are quick hacky prototypes that were created to test its
+  feasibility.
+</p>
+<ol>
+<li>A nice feature when exploring source code is to get a sense of what
+     functions are called from a given function.  While static analysis
+     might not reveal the runtime call graph, it might still help in
+     navigating source code.  Here are some screenshots of the feature
+     being developed in action:
+
+
+<div class="figure">
+<p><img src="callgraph1.png"  alt="callgraph1.png" /></p>
+<p>Call Graph visualisation enables easy exploration of source code by just clicking through.</p>
+</div>
+
+</li>
+<li>Full text search on the code base based on search terms.  Right
+     now, code search is implemented just as a full text search.
+     Since a code fragment has a lot of structure to it, I plan to
+     explore the possibility of tokenising code before creating
+     full-text indexes.
+
+
+<div class="figure">
+<p><img src="callgraph2.png"  alt="callgraph2.png" /></p>
+<p>Full text search with highlighting mouse-over token.</p>
+</div>
+
+</li>
+<li>Another feature planned is a simple REST API to the database.
+     With mongodb's REST API already accessible via the admin
+     interface, it should be easy to support a restricted version of
+     it for users.  Since mongodb allows modifying schema on the fly,
+     the API would enable interesting applications to be built on top
+     of plain token search, like taking notes on specific lines of
+     source code.
+
+<p>
+     The API would also help integrate better search functionality
+     easily within editors like emacs/vim.
+</p>
+</li>
+<li>Support for importing source code from various places online,
+     like sourceforge, svn/git repositories, github, etc.
+</li>
+</ol>
+
+</div>
+
+</div>
+
+<div id="outline-container-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Conclusion </h2>
+<div class="outline-text-2" id="text-7">
+
+<p>  In this post I described the architecture of an early prototype of
+  CodeSearch, a tool to search through massive pieces of code.  We
+  also saw how mongodb has helped rapidly iterate and ease the burden
+  of creating a new search application.
+</p>
+<p>
+  Since this application is still in its infancy, I have not faced any
+  scaling issues yet.  That would perhaps be the topic of another blog
+  post. :-)
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> Tools used </h2>
+<div class="outline-text-2" id="text-8">
+
+<p>  I used a lot of opensource tools to rapidly develop components of
+  the CodeSearch app.
+</p>
+<ol>
+<li>mongodb.  Of course, since this post is about mongodb :)
+
+</li>
+<li>Flask.  Simple microframework for webapp development:
+     <a href="http://flask.pocoo.org/">http://flask.pocoo.org/</a>.
+
+</li>
+<li>Source code parsing.
+<ul>
+<li>ctags for parsing identifiers: <a href="http://ctags.sourceforge.net">http://ctags.sourceforge.net</a>
+</li>
+<li>cscope for generating call graphs: <a href="http://cscope.sourceforge.net">http://cscope.sourceforge.net</a>
+
+</li>
+</ul>
+</li>
+<li>jQuery Mobile UI and jQuery UI for the UI elements
+<ul>
+<li><a href="http://jqueryui.com">http://jqueryui.com</a>
+</li>
+<li><a href="http://jquerymobile.com">http://jquerymobile.com</a>
+
+</li>
+</ul>
+</li>
+<li>Other utilities for browsing through source code:
+<ul>
+<li>GNU/Global: <a href="http://www.gnu.org/software/global">http://www.gnu.org/software/global</a>
+</li>
+<li>doxygen: <a href="http://www.doxygen.org">http://www.doxygen.org</a>
+</li>
+<li>silentbob: <a href="http://silentbob.sourceforge.net">http://silentbob.sourceforge.net</a>
+</li>
+<li>llvm's clangtools:
+       <a href="https://llvm.org/viewvc/llvm-project/cfe/trunk/tools/c-index-test/">https://llvm.org/viewvc/llvm-project/cfe/trunk/tools/c-index-test/</a>
+</li>
+<li>Google codesearch: <a href="http://google.com/codesearch">http://google.com/codesearch</a>
+</li>
+<li>Linux cross reference: <a href="http://lxr.free-electrons.com">http://lxr.free-electrons.com</a>
+</li>
+</ul>
+</li>
+</ol>
+
+</div>
+
+</div>
+
+<div id="outline-container-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> About me </h2>
+<div class="outline-text-2" id="text-9">
+
+<p>  I am a graduate student with interests in Networks<sup><a class="footref" name="fnr.1" href="#fn.1">1</a></sup>, Security and
+  <a href="http://www.stanford.edu/~jvimal/recipes/">Cooking</a>.  I like <a href="http://cm.baylor.edu/welcome.icpc">problem solving</a> and occasionally writing useful
+  software and <a href="http://stanford.edu/~jvimal/map-routers-1.png">visualisation</a>.
+</p>
+
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+<p class="footnote"><sup><a class="footnum" name="fn.1" href="#fnr.1">1</a></sup> This explains why most of the examples were identifiers from
+the TCP/IP stack in the Linux Kernel.
+</p>
+</div>
+</div>
+<div id="postamble">
+<p class="author">Author: Vimalkumar (<a href="mailto:j.vimal@gmail.com">j.vimal@gmail.com</a>)</p>
+<p class="date">Date: 2011-04-30 19:35:28 PDT</p>
+<p class="creator">Generated by Org version 7.4 with Emacs version 24</p>
+<p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
+</div>
+</div>
+</body>
+</html>
