@@ -186,10 +186,6 @@ def db_search(limit=20,**kwargs):
                 })
     return {'count': count, 'results': ret}
 
-#populate_db('tags')
-#index()
-#sample()
-
 def preprocess(s):
     ret = {}
     allowed_keys = ["token","file","kind","lang"]
@@ -211,9 +207,6 @@ def preprocess(s):
     else:
         ret['token'] = '^%s' % s
     return ret
-
-#print preprocess('file:lo')
-#sys.exit(0)
 
 @app.route('/token/<s>')
 def search(s):
