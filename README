@@ -1,0 +1,31 @@
+Welcome to ctags-instant.
+
+This is a web-interface that allows you to search through identifiers
+in your source code.  Currently, tags are generated using ctags;
+support for other tag generators like GNU/Global will be added later.
+
+This is just a proof of concept app, and I would not consider this a
+well written software by any standards.  Please use this with
+caution. :)
+
+How to run
+----------
+You'll need the following programs:
+  * Exuberant ctags: http://ctags.sourceforge.net
+  * mongodb: http://www.mongodb.org
+  * python: http://www.python.org
+
+You'll need the following libraries for python.  All of them can be
+easy_install'ed..
+
+  * pymongo
+  * Flask: http://flask.pocoo.org
+  * termcolor
+  * json
+  * argparse
+
+Then, just type:
+
+  $ python instant.py -d /path/to/source/dir
+
+Then, point your browser to: http://localhost:5000
