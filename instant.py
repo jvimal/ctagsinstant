@@ -23,7 +23,10 @@ tagscollection = 'tags'
 started = False
 mongod_process = None
 
-parser = argparse.ArgumentParser(description="ctags instant")
+parser = argparse.ArgumentParser(description="""
+ctags instant:  An "instant search" interface to ctags
+via the browser.
+""")
 parser.add_argument('--source-dir',
                     '-d',
                     action='store',
@@ -49,6 +52,10 @@ args = None
 
 def log(s):
     print T.colored(s, "yellow")
+
+def log_line(s):
+    print T.colored(s, "green"),
+    sys.stdout.flush()
 
 def check_mongod():
     args.mongod_path = os.path.expanduser(args.mongod_path)
@@ -107,7 +114,7 @@ def start():
         except:
             sleep(1)
             continue
-    dbname = args.source_dir.replace('/','|')
+    dbname = args.source_dir.replace('/','|').replace('.','')
     db = connection[dbname]
     t = db[tagscollection]
     log("Found databases: %s" % (', '.join(connection.database_names())))
@@ -123,8 +130,11 @@ def stop():
     mongod_process.wait()
 
 def read_ctags(fname):
-    lines = open(fname).readlines()
+    lines = open(fname).xreadlines()
     lst = []
+    MOD = 1532 # some random number
+    count = 0
+    log_line("Reading from file: %s\n" % fname)
     for l in lines:
         try:
             if l.startswith('!'):
@@ -138,23 +148,27 @@ def read_ctags(fname):
                     'filename': file }
             row.update(dict(map(lambda i: tuple(i.split(':',1)), opts)))
             lst.append(row)
+            count += 1
+            if count % MOD == 0:
+                log_line("Read %d tags\t\t\t\r" % count)
         except:
             pass
+    log_line("Read a total of %d tags" % count)
     return lst
 
 def populate_db(fname):
     log('Reading tags')
     tags = read_ctags(fname)
+    log("Populating db...")
     t.insert(tags)
     log('Populated db')
 
 def create_project(source_dir):
     # First, we create the TAGS file for this project
     tags_file = os.path.join(source_dir, "tags_mongo")
-    log("Creating tags... %s, %s" % ( tags_file, source_dir))
+    log("Creating tags file\n\tTags: %s\n\tSource dir:%s" % ( tags_file, source_dir))
     Popen("ctags -R --fields=+afmikKlnsStz -f \"%s\" \"%s\"" % (tags_file, source_dir),
           shell=True).wait()
-    log("Reading tags...")
     populate_db(tags_file)
     index()
 
