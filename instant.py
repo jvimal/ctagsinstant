@@ -61,14 +61,12 @@ def check_mongod():
         return True
     return False
 
-def check_db(root_dir):
-    db_dir = os.path.join(root_dir, "mongo_db")
+def check_db(db_dir):
     db_dir = os.path.expanduser(db_dir)
     return os.path.exists(db_dir)
 
-def create_db(root_dir):
+def create_db(db_dir):
     try:
-        db_dir = os.path.join(root_dir, "mongo_db")
         db_dir = os.path.expanduser(db_dir)
         os.mkdir(db_dir)
     except Exception, e:
@@ -81,7 +79,7 @@ def start_mongod(dbpath='db/'):
         log("Error: mongod not found.")
         sys.exit(-1)
     if not check_db(dbpath):
-        log("Database directory not found.  creating...")
+        log("Database directory %s not found.  creating..." % dbpath)
         create_db(dbpath)
     cmd = "%s --dbpath=\"%s\"" % (args.mongod_path, dbpath)
     if args.quiet:
