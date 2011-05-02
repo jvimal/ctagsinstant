@@ -10,7 +10,10 @@ caution. :)
 
 How to run
 ----------
-You'll need the following programs:
+
+You'll need the following programs.  The first two need to be in your
+$PATH.
+
   * Exuberant ctags: http://ctags.sourceforge.net
   * mongodb: http://www.mongodb.org
   * python: http://www.python.org
