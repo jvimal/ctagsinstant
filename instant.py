@@ -244,4 +244,4 @@ if __name__ == "__main__":
     except Exception, e:
         log("Error...")
         log(`e`)
-        mongod_process.terminate()
+        stop()
