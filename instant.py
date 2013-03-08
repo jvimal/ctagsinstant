@@ -9,7 +9,7 @@ import json
 from flask import Flask,url_for,redirect
 
 import argparse
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, check_output
 import os
 from time import sleep
 import termcolor as T
